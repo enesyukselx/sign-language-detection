@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function App() {
-    const [type, setType] = useState(CameraType.back);
+    const [type, setType] = useState(CameraType.front);
     const cameraRef = useRef<any>(null);
     const [permission, requestPermission] = Camera.useCameraPermissions();
 
@@ -14,13 +14,18 @@ export default function App() {
 
         const internal = setInterval(() => {
             if (!cameraRef || !cameraRef.current) return;
-
-            cameraRef.current
-                .takePictureAsync({ base64: true })
-                .then((photo: any) => {
-                    console.log(photo.base64);
-                });
-        }, 1000);
+            if (cameraRef.current) {
+                cameraRef.current
+                    .takePictureAsync({
+                        base64: true,
+                        quality: 0.2,
+                        skipProcessing: true,
+                    })
+                    .then((photo: any) => {
+                        console.log(photo.base64);
+                    });
+            }
+        }, 5000);
 
         return () => clearInterval(internal);
     }, [cameraRef.current, permission]);
