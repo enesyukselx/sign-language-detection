@@ -11,6 +11,13 @@ mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils 
 #########################################################
 label_map_path = os.path.join(DATA_PATH, "label_map.txt")
+if not os.path.exists(DATA_PATH):
+    os.makedirs(DATA_PATH)
+    with open(label_map_path, "w") as f:
+        for action, label in new_actions_with_labels.items():
+            f.write(f"{action}:{label}\n")
+    print("Etiket Haritası Oluşturuldu:")
+    print(new_actions_with_labels)
 existing_label_map = {}
 if os.path.exists(label_map_path):
     with open(label_map_path, "r") as f:
