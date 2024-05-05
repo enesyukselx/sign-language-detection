@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
 import mediapipe as mp
-from keras.models import load_model
+from keras.models import load_model # type: ignore
 from utils.mediapipe_detection import mediapipe_detection as mpdetection
 from utils.extract_keypoints import extract_keypoints
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
-from settings.create_model import actions
 from utils.base64_to_image import base64_to_image
+from settings.create_model import actions
 from data.sampleBase64 import base64Image
 
 model = load_model('sign_language.keras')
@@ -22,7 +22,6 @@ def prob_viz(res, actions, input_frame, colors):
 
 #image_url = "https://www.shutterstock.com/image-photo/old-man-making-out-hands-260nw-551186926.jpg"
 #image = url_to_image(image_url)
-
 image = base64_to_image(base64Image)
 
 mp_holistic = mp.solutions.holistic 

@@ -2,7 +2,6 @@ import cv2
 import os
 import mediapipe as mp
 import numpy as np
-
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from utils.mediapipe_detection import mediapipe_detection as mpdetection
 from utils.extract_keypoints import extract_keypoints
@@ -10,7 +9,6 @@ from settings.create_model import DATA_PATH, existing_label_map, new_actions_wit
 
 mp_holistic = mp.solutions.holistic 
 mp_drawing = mp.solutions.drawing_utils 
-
 #########################################################
 label_map_path = os.path.join(DATA_PATH, "label_map.txt")
 existing_label_map = {}

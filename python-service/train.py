@@ -1,11 +1,11 @@
 import os
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split # type: ignore
 from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Dense, LSTM
-from keras.callbacks import TensorBoard
-from keras.utils import to_categorical
+from keras.models import Sequential # type: ignore
+from keras.layers import Dense, LSTM # type: ignore
+from keras.callbacks import TensorBoard # type: ignore
+from keras.utils import to_categorical # type: ignore
 from settings.create_model import actions, DATA_PATH, sequence_length
 
 label_map = {label:num for num, label in enumerate(actions)}
