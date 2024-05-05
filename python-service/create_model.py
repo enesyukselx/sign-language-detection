@@ -1,67 +1,66 @@
 import cv2
-import numpy as np
 import os
-from matplotlib import pyplot as plt
-import time
 import mediapipe as mp
+import numpy as np
 
-mp_holistic = mp.solutions.holistic # Holistic model
-mp_drawing = mp.solutions.drawing_utils # Drawing utilities
+from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
+from utils.mediapipe_detection import mediapipe_detection as mpdetection
+from utils.extract_keypoints import extract_keypoints
+from settings.create_model import DATA_PATH, existing_label_map, new_actions_with_labels, no_sequences, sequence_length
 
-def mediapipe_detection(image, model):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # COLOR CONVERSION BGR 2 RGB
-    image.flags.writeable = False                  # Image is no longer writeable
-    results = model.process(image)                 # Make prediction
-    image.flags.writeable = True                   # Image is now writeable 
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) # COLOR COVERSION RGB 2 BGR
-    return image, results
+mp_holistic = mp.solutions.holistic 
+mp_drawing = mp.solutions.drawing_utils 
 
-def draw_landmarks(image, results):
-    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS) # Draw face connections
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS) # Draw pose connections
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS) # Draw left hand connections
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS) # Draw right hand connections
+#########################################################
+label_map_path = os.path.join(DATA_PATH, "label_map.txt")
+existing_label_map = {}
+if os.path.exists(label_map_path):
+    with open(label_map_path, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            action, label = line.strip().split(":")
+            existing_label_map[action] = int(label)
+for action, label in new_actions_with_labels.items():
+    if action not in existing_label_map:
+        existing_label_map[action] = label
+with open(label_map_path, "w") as f:
+    for action, label in existing_label_map.items():
+        f.write(f"{action}:{label}\n")
+print("Güncellenmiş Etiket Haritası:")
+print(existing_label_map)
+actions = np.array(list(existing_label_map.keys()))
+#########################################################
 
-def draw_styled_landmarks(image, results):
-    # Draw face connections
-    mp_drawing.draw_landmarks(image, results.face_landmarks, mp_holistic.FACE_CONNECTIONS, 
-                             mp_drawing.DrawingSpec(color=(80,110,10), thickness=1, circle_radius=1), 
-                             mp_drawing.DrawingSpec(color=(80,256,121), thickness=1, circle_radius=1)
-                             ) 
-    # Draw pose connections
-    mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                             mp_drawing.DrawingSpec(color=(80,22,10), thickness=2, circle_radius=4), 
-                             mp_drawing.DrawingSpec(color=(80,44,121), thickness=2, circle_radius=2)
-                             ) 
-    # Draw left hand connections
-    mp_drawing.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                             mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4), 
-                             mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2)
-                             ) 
-    # Draw right hand connections  
-    mp_drawing.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS, 
-                             mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=4), 
-                             mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2)
-                             ) 
-    
-cv2.namedWindow("preview")
+
 cap = cv2.VideoCapture(0)
-# Set mediapipe model 
-with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
-    while cap.isOpened():
-        # Read feed
-        ret, frame = cap.read()
-        # Make detections
-        image, results = mediapipe_detection(frame, holistic)        
-        # Draw landmarks
-        draw_styled_landmarks(image, results)
-        # Show to screen
-        cv2.imshow('OpenCV Feed', image)
-        # Break gracefully
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cap.release()
-    cv2.destroyAllWindows()
 
-draw_landmarks(frame, results)
-plt.imshow(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+with mp.solutions.holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    for action, label in new_actions_with_labels.items():
+        for sequence in range(no_sequences):
+            for frame_num in range(sequence_length):
+                ret, frame = cap.read()
+                image, results = mpdetection(frame, holistic)
+                dslandmarks(image, results, mp_holistic, mp_drawing)
+                if frame_num == 0: 
+                    cv2.putText(image, 'STARTING COLLECTION', (120,200), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255, 0), 4, cv2.LINE_AA)
+                    cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15,12), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                    cv2.imshow('OpenCV Feed', image)
+                    cv2.waitKey(2000)
+                else: 
+                    cv2.putText(image, 'Collecting frames for {} Video Number {}'.format(action, sequence), (15,12), 
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                    cv2.imshow('OpenCV Feed', image)
+                
+                folder_path = os.path.join(DATA_PATH, action, str(sequence))
+                os.makedirs(folder_path, exist_ok=True)
+                
+                keypoints = extract_keypoints(results)
+                npy_path = os.path.join(folder_path, str(frame_num) + '.npy')
+                np.save(npy_path, keypoints)
+                
+                if cv2.waitKey(10) & 0xFF == ord('q'):
+                    break
+cap.release()
+cv2.destroyAllWindows()
