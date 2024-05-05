@@ -3,3 +3,4 @@
 .env*.local
 MP_Data
 __pycache__
+Logs
