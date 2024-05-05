@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 import mediapipe as mp
 from keras.models import load_model
-from urllib.request import urlopen
 from utils.mediapipe_detection import mediapipe_detection as mpdetection
 from utils.extract_keypoints import extract_keypoints
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from settings.create_model import actions
-from settings.create_model import existing_label_map
+from utils.base64_to_image import base64_to_image
+from data.sampleBase64 import base64Image
 
 model = load_model('sign_language.keras')
 
@@ -20,11 +20,10 @@ def prob_viz(res, actions, input_frame, colors):
         
     return output_frame
 
-def url_to_image(url):
-    resp = urlopen(url)
-    image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    return image
+#image_url = "https://www.shutterstock.com/image-photo/old-man-making-out-hands-260nw-551186926.jpg"
+#image = url_to_image(image_url)
+
+image = base64_to_image(base64Image)
 
 mp_holistic = mp.solutions.holistic 
 mp_drawing = mp.solutions.drawing_utils 
@@ -33,9 +32,6 @@ sequence = []
 sentence = []
 predictions = []
 threshold = 0.5
-
-image_url = "https://www.shutterstock.com/image-photo/old-man-making-out-hands-260nw-551186926.jpg"
-image = url_to_image(image_url)
 
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
     image, results = mpdetection(image, holistic)
