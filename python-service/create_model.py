@@ -31,7 +31,6 @@ print(existing_label_map)
 actions = np.array(list(existing_label_map.keys()))
 #########################################################
 
-
 cap = cv2.VideoCapture(0)
 
 with mp.solutions.holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
