@@ -27,9 +27,9 @@ img = cv2.imdecode(arr, -1)
 
 image, results = mpdetection(img, mp_holistic)
 
-cv2.imshow("Processed Image", image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+#cv2.imshow("Processed Image", image)
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
 
 keypoints = extract_keypoints(results)
 
