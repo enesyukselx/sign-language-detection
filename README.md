@@ -18,6 +18,7 @@ py -m uvicorn predict:app
 ### Docker Installation
 
 ```sh
+cd python-service
 docker pull tiangolo/uvicorn-gunicorn-fastapi
 docker build -t myapp .
 docker run -p 80:80 myapp
