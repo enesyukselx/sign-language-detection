@@ -9,7 +9,7 @@ from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from settings.create_model import actions
 from settings.create_model import existing_label_map
 
-model = load_model('sign_language.h5')
+model = load_model('sign_language.keras')
 
 colors = [(245,117,16), (117,245,16), (16,117,245)]
 def prob_viz(res, actions, input_frame, colors):

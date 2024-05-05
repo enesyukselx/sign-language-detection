@@ -6,7 +6,10 @@ from urllib.request import urlopen
 from utils.mediapipe_detection import mediapipe_detection as mpdetection
 from utils.extract_keypoints import extract_keypoints
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
+from settings.create_model import actions
 from settings.create_model import existing_label_map
+
+model = load_model('sign_language.keras')
 
 colors = [(245,117,16), (117,245,16), (16,117,245)]
 def prob_viz(res, actions, input_frame, colors):
@@ -17,28 +20,55 @@ def prob_viz(res, actions, input_frame, colors):
         
     return output_frame
 
-model = load_model('sign_language.h5')
+def url_to_image(url):
+    resp = urlopen(url)
+    image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    return image
 
-mp_holistic = mp.solutions.holistic.Holistic()
+mp_holistic = mp.solutions.holistic 
+mp_drawing = mp.solutions.drawing_utils 
 
-url = "https://i.ytimg.com/vi/5XIzXpyz22E/maxresdefault.jpg" 
-arr = np.asarray(bytearray(urlopen(url).read()), dtype=np.uint8)
-img = cv2.imdecode(arr, -1)
+sequence = []
+sentence = []
+predictions = []
+threshold = 0.5
 
-image, results = mpdetection(img, mp_holistic)
+image_url = "https://www.shutterstock.com/image-photo/old-man-making-out-hands-260nw-551186926.jpg"
+image = url_to_image(image_url)
 
-#cv2.imshow("Processed Image", image)
-#cv2.waitKey(0)
-#cv2.destroyAllWindows()
+with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+    image, results = mpdetection(image, holistic)
+        
+    dslandmarks(image, results, mp_holistic, mp_drawing)
+        
+    keypoints = extract_keypoints(results)
+    sequence = [keypoints] * 30 
+        
+    res = model.predict(np.expand_dims(sequence, axis=0))[0]
+    print(actions[np.argmax(res)])
+    predictions.append(np.argmax(res))
+        
+    if np.unique(predictions[-10:])[0]==np.argmax(res): 
+        if res[np.argmax(res)] > threshold: 
+            if len(sentence) > 0: 
+                if actions[np.argmax(res)] != sentence[-1]:
+                    sentence.append(actions[np.argmax(res)])
+            else:
+                sentence.append(actions[np.argmax(res)])
 
-keypoints = extract_keypoints(results)
+    if len(sentence) > 5: 
+        sentence = sentence[-5:]
 
-X = np.expand_dims(keypoints, axis=0)
-X = np.expand_dims(X, axis=0)
-
-y_pred = model.predict(X)
-
-for key, value in existing_label_map.items():
-    print(f"{key}: %{y_pred[0][value-1]*100}")
-
-print("Tahmin: ", max(existing_label_map, key=lambda k: y_pred[0][existing_label_map[k]-1]))
+    image = prob_viz(res, actions, image, colors)
+        
+    cv2.rectangle(image, (0,0), (640, 40), (245, 117, 16), -1)
+    cv2.putText(image, ' '.join(sentence), (3,30), 
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        
+    cv2.imshow('OpenCV Feed', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    
+    
+    
