@@ -22,7 +22,8 @@ export default function App() {
                         skipProcessing: true,
                     })
                     .then((photo: any) => {
-                        console.log(photo.base64);
+                        //FETCH CODE
+                        //console.log(photo.base64);
                     });
             }
         }, 5000);
@@ -65,6 +66,27 @@ export default function App() {
                     </TouchableOpacity>
                 </View>
             </Camera>
+            <View
+                style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    backgroundColor: "white",
+                    padding: 16,
+                }}
+            >
+                <Text
+                    style={{
+                        fontSize: 24,
+                        fontWeight: "bold",
+                        color: "black",
+                        textAlign: "center",
+                    }}
+                >
+                    <Text style={{ color: "blue" }}>Tahmin: </Text> Hello
+                </Text>
+            </View>
         </View>
     );
 }
@@ -81,7 +103,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "row",
         backgroundColor: "transparent",
-        margin: 64,
+        margin: 84,
     },
     button: {
         flex: 1,
