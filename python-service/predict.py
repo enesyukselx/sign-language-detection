@@ -1,3 +1,5 @@
+from fastapi import FastAPI, Form
+app = FastAPI()
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -8,7 +10,6 @@ from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from utils.base64_to_image import base64_to_image
 from utils.prob_viz import prob_viz, colors
 from settings.create_model import actions
-from data.sampleBase64 import base64Image
 
 model = load_model('sign_language.keras')
 
@@ -61,5 +62,10 @@ def predictWithBase64(img: str, openWindow: bool = False):
             cv2.destroyAllWindows()
         return actions[np.argmax(res)]
     
-predict = predictWithBase64(base64Image)
-print(predict)
+
+@app.post("/")
+def predict(base64_code: str = Form()):
+    prediction = predictWithBase64(base64_code)
+    return {"prediction": prediction}
+
+
