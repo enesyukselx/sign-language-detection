@@ -7,6 +7,8 @@ export default function App() {
     const cameraRef = useRef<any>(null);
     const [permission, requestPermission] = Camera.useCameraPermissions();
 
+    const [prediction, setPrediction] = useState<string | null>(null);
+
     useEffect(() => {
         if (!permission || !permission.granted) {
             return;
@@ -22,11 +24,27 @@ export default function App() {
                         skipProcessing: true,
                     })
                     .then((photo: any) => {
-                        //FETCH CODE
-                        //console.log(photo.base64);
+                        let formData = new FormData();
+                        formData.append("base64_code", photo.base64);
+
+                        fetch("http://192.168.1.102:80/", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                            },
+                            body: formData,
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                console.log(data.prediction);
+                                setPrediction(data.prediction);
+                            })
+                            .catch((error) => {
+                                console.error("Error:", error);
+                            });
                     });
             }
-        }, 5000);
+        }, 1500);
 
         return () => clearInterval(internal);
     }, [cameraRef.current, permission]);
@@ -84,7 +102,7 @@ export default function App() {
                         textAlign: "center",
                     }}
                 >
-                    <Text style={{ color: "blue" }}>Tahmin: </Text> Hello
+                    <Text style={{ color: "blue" }}>Tahmin: </Text> {prediction}
                 </Text>
             </View>
         </View>
