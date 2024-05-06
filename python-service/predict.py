@@ -9,9 +9,9 @@ from utils.extract_keypoints import extract_keypoints
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from utils.base64_to_image import base64_to_image
 from utils.prob_viz import prob_viz, colors
-from settings.create_model import actions
+from settings.create_model import actions, keras_model_name
 
-model = load_model('sign_language.keras')
+model = load_model(keras_model_name)
 
 #image_url = "https://www.shutterstock.com/image-photo/old-man-making-out-hands-260nw-551186926.jpg"
 #image = url_to_image(image_url)

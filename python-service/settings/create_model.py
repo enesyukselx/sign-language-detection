@@ -8,3 +8,6 @@ no_sequences = 30
 # Videos are going to be 30 frames in length
 sequence_length = 30
 actions = np.array(list(existing_label_map.keys()))
+
+epoch_count = 10000
+keras_model_name = 'sign_language.keras'

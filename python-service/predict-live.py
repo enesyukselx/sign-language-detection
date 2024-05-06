@@ -7,9 +7,9 @@ from utils.mediapipe_detection import mediapipe_detection as mpdetection
 from utils.extract_keypoints import extract_keypoints
 from utils.draw_styled_landmarks import draw_styled_landmarks as dslandmarks
 from utils.prob_viz import prob_viz, colors
-from settings.create_model import actions
+from settings.create_model import actions, keras_model_name
 
-model = load_model('sign_language.keras')
+model = load_model(keras_model_name)
 
 mp_holistic = mp.solutions.holistic 
 mp_drawing = mp.solutions.drawing_utils 

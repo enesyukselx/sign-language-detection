@@ -6,7 +6,7 @@ from keras.models import Sequential # type: ignore
 from keras.layers import Dense, LSTM # type: ignore
 from keras.callbacks import TensorBoard # type: ignore
 from keras.utils import to_categorical # type: ignore
-from settings.create_model import actions, DATA_PATH, sequence_length
+from settings.create_model import actions, DATA_PATH, sequence_length, epoch_count, keras_model_name
 
 label_map = {label:num for num, label in enumerate(actions)}
 sequences, labels = [], []
@@ -36,6 +36,6 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(actions.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.fit(X_train, y_train, epochs=10000, callbacks=[tb_callback])
+model.fit(X_train, y_train, epochs=epoch_count, callbacks=[tb_callback])
 model.summary()
-model.save('sign_language.keras')
+model.save(keras_model_name)
