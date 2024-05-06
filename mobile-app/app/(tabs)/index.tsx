@@ -44,7 +44,7 @@ export default function App() {
                             });
                     });
             }
-        }, 1500);
+        }, 1000);
 
         return () => clearInterval(internal);
     }, [cameraRef.current, permission]);
@@ -80,7 +80,7 @@ export default function App() {
                         style={styles.button}
                         onPress={toggleCameraType}
                     >
-                        <Text style={styles.text}>Flip Camera</Text>
+                        <Text style={styles.text}>Kamerayı döndür</Text>
                     </TouchableOpacity>
                 </View>
             </Camera>
@@ -102,7 +102,7 @@ export default function App() {
                         textAlign: "center",
                     }}
                 >
-                    <Text style={{ color: "blue" }}>Tahmin: </Text> {prediction}
+                    {prediction}
                 </Text>
             </View>
         </View>
