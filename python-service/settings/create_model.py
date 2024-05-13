@@ -1,7 +1,7 @@
 import numpy as np
 
 DATA_PATH="MP_Data"
-existing_label_map = {'merhaba':1,'tamam':2,'seni seviyorum':3}
+existing_label_map = {'merhaba':1,'tamam':2, 'tesekkurler': 3}
 new_actions_with_labels = {}
 # Number of videos to collect
 no_sequences = 30
@@ -9,5 +9,5 @@ no_sequences = 30
 sequence_length = 30
 actions = np.array(list(existing_label_map.keys()))
 
-epoch_count = 10000
-keras_model_name = 'sign_language.keras'
+epoch_count = 5000
+keras_model_name = 'sign_language_v4.keras'
