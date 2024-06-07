@@ -27,7 +27,7 @@ export default function App() {
                         let formData = new FormData();
                         formData.append("base64_code", photo.base64);
 
-                        fetch("http://192.168.1.102:80/", {
+                        fetch("http://"+process.env.EXPO_PUBLIC_IPV4+":80/", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "multipart/form-data",
